@@ -67,16 +67,15 @@ protected:
   int    leptonMuon;     //!<Muon lepton number
   int    leptonTau;      //!<Tau lepton number
   bool   stable;         //!<defines whether this ParticleType is stable
-  bool   weakStable;     //!<particle is weakly stable (i.e., decays by weak-decay)
+  bool   enabled;        //!<particle declared not used
+  bool   decayEnabled;   //!<particle decays are turned off externally
   int    antiParticleIndex; //!< index (in the active DB) of the antiparticle of this particle.
   std::vector<ParticleDecayMode> decayModes; //!<Array of decay modes
   SelectionGenerator decayRndmSelector;
 
-  double spinFactor;
-  double isospinFactor;
-  double statistics;
-  bool   setupDone;
-
+  double spinFactor;     //! spin degeneracy
+  double isospinFactor;  //! isospin degeneracy
+  double statistics;     //!  fermion or boson
 
 public:
   
@@ -514,9 +513,12 @@ public:
   bool isStable() const;
 
   //!
-  //! Return true if this particle decays by weak decay
+  //! Return true if this particle has been declared disabled.
   //!
-  bool isWeakStable() const;
+  bool isDisabled() const;
+  bool isEnabled() const;
+  void enable();
+  void disable();
 
   void addDecayMode(double branchingRatio, std::vector<int> children);
   void addDecayMode(ParticleDecayMode &decayMode);
@@ -525,12 +527,19 @@ public:
   //! Return the number of distinct decay modes of this particle
   //!
   int getNDecayModes() const;
-  bool  hasDecayModes() const;
+  bool hasDecayModes() const;
+  bool isDecayEnabled()  const;
+  bool isDecayDisabled() const;
+  void enableDecay();
+  void disableDecay();
+
+
 
   ParticleDecayMode & getDecayMode(int index);
   ParticleDecayMode & generateDecayMode();
   void   setStable(bool value);
-  void   setweakStable(bool value);
+
+
   std::vector<ParticleDecayMode> & getDecayModes();
   ostream & printProperties(ostream & os);
   ostream & printDecayProperties(ostream & os);

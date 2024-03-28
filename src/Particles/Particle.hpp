@@ -260,13 +260,18 @@ public:
   //!
   //!Return "true" if this particle has decayed.
   //!
-  bool isDecayed() const             { return !live;      }
-
+  bool isDecayed() const { return !live;      }
 
   //!
   //!Return "true" if this particle is stable for the intent and purpose of the simulation in progress
   //!
-  bool isStable() const              { if (type) return type->isStable(); else return true; }
+  bool isStable() const { if (type) return type->isStable(); else return true; }
+
+  //!
+  //!Return "true" if this particle is disabled for the intent and purpose of the simulation in progress
+  //!
+  bool isDisabled() const { if (type) return type->isStable(); else return true; }
+
 
 
   //!

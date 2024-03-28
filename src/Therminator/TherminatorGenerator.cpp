@@ -15,6 +15,7 @@
  *      http://therminator2.ifj.edu.pl/                                         *
  *                                                                              *
  * For the detailed description of the program and further references           *
+ * For the detailed description of the program and further references           *
  * to the description of the model please refer to                              *
  * http://arxiv.org/abs/1102.0273                                               *
  *                                                                              *
@@ -257,33 +258,44 @@ void TherminatorGenerator::createEvent()
   double mean  = 0;
   for (unsigned int iType=0; iType<nTypes; iType++)
     {
-    switch (multiplicitiesFluctType)
+    ParticleType * type = (*particleDb)[iType];
+    // Use type->disable() to disable a particle type.
+    // This eliminates the generation of particles that are not of interest
+    // The simulation can then proceed much faster.
+    if (type->isDisabled())
       {
-        case 0: // Poisson fluctuations
+      mult = 0;
+      }
+    else
+      {
+      switch (multiplicitiesFluctType)
         {
-        mean  = multiplicitiesFraction * averageMultiplicities[iType].multiplicity;
-        mult  = gRandom->Poisson(mean);
-        }
-        break;
-        case 1: // Negative Binomial  fluctuations
-        {
-        mult = 0; // HOW?
-        }
-        break;
-        default:
-        case 2: // Gaussian fluctuations
-        {
-        mean  = multiplicitiesFraction * averageMultiplicities[iType].multiplicity;
-        mult  = TMath::Max(0, int(gRandom->Gaus(mean,sqrt(mean))));
-        }
-        break;
-        case 3:  // Poisson or Gaussian fluctuations
-        {
-        mean  = multiplicitiesFraction * averageMultiplicities[iType].multiplicity;
-        if (mean>20)
-          mult = TMath::Max(0, int(gRandom->Gaus(mean,sqrt(mean))));
-        else
-          mult = TMath::Max(0, int(gRandom->Poisson(mean)));
+          case 0: // Poisson fluctuations
+          {
+          mean  = multiplicitiesFraction * averageMultiplicities[iType].multiplicity;
+          mult  = gRandom->Poisson(mean);
+          }
+          break;
+          case 1: // Negative Binomial  fluctuations
+          {
+          mult = 0; // HOW?
+          }
+          break;
+          default:
+          case 2: // Gaussian fluctuations
+          {
+          mean  = multiplicitiesFraction * averageMultiplicities[iType].multiplicity;
+          mult  = TMath::Max(0, int(gRandom->Gaus(mean,sqrt(mean))));
+          }
+          break;
+          case 3:  // Poisson or Gaussian fluctuations
+          {
+          mean  = multiplicitiesFraction * averageMultiplicities[iType].multiplicity;
+          if (mean>20)
+            mult = TMath::Max(0, int(gRandom->Gaus(mean,sqrt(mean))));
+          else
+            mult = TMath::Max(0, int(gRandom->Poisson(mean)));
+          }
         }
       }
     eventMultiplicities[iType] = mult;

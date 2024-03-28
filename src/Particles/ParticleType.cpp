@@ -61,15 +61,15 @@ nat(0),
 leptonElectron(0),
 leptonMuon(0),
 leptonTau(0),
-stable(0),
-weakStable(0),
+stable(1),
+enabled(1),
+decayEnabled(0),
 antiParticleIndex(-1),
 decayModes(),
 decayRndmSelector(),
 spinFactor(1.0),
 isospinFactor(1.0),
-statistics(-1.0),
-setupDone(0)
+statistics(-1.0)
 {
   decayModes.clear();
 }
@@ -114,13 +114,14 @@ leptonElectron(source.leptonElectron),
 leptonMuon(source.leptonMuon),
 leptonTau(source.leptonTau),
 stable(source.stable),
-weakStable(source.weakStable),
+enabled(source.enabled),
+decayEnabled(source.decayEnabled),
+antiParticleIndex(-1),
 decayModes(source.decayModes),
 decayRndmSelector(source.decayRndmSelector),
 spinFactor(source.spinFactor),
 isospinFactor(source.isospinFactor),
-statistics(source.statistics),
-setupDone(source.setupDone)
+statistics(source.statistics)
 {
 // no ops
 }
@@ -161,13 +162,14 @@ ParticleType & ParticleType::operator=(const ParticleType & source)
     leptonMuon         =  source.leptonMuon;
     leptonTau          =  source.leptonTau;
     stable             =  source.stable;
-    weakStable         =  source.weakStable;
+    enabled            =  source.enabled;
+    decayEnabled       =  source.decayEnabled;
+    antiParticleIndex  =  source.antiParticleIndex;
     decayModes         =  source.decayModes;
     decayRndmSelector  =  source.decayRndmSelector;
     spinFactor         =  source.spinFactor;
     isospinFactor      =  source.isospinFactor;
     statistics         =  source.statistics;
-    setupDone          =  source.setupDone;
     }
   return *this;
 }
@@ -175,13 +177,15 @@ ParticleType & ParticleType::operator=(const ParticleType & source)
 
 bool ParticleType::isStable() const
 {
-  return decayModes.size()<1;
+  return stable;
 }
 
-bool ParticleType::isWeakStable() const
-{
-  return weakStable;
-}
+
+
+bool ParticleType::isDisabled() const {  return !enabled; }
+bool ParticleType::isEnabled() const {  return enabled; }
+
+
 
 int ParticleType::getNDecayModes() const
 {
@@ -197,8 +201,6 @@ ParticleDecayMode & ParticleType::getDecayMode(int index)
 {
   return decayModes[index];
 }
-
-
 
 //!
 //! Add a decay mode to this particle type based on the given branching fraction (branching ratio) and the given array of children
@@ -226,14 +228,15 @@ void ParticleType::addDecayMode(double branchingRatio,
 //! Add a decay mode to this particle type based on the given decayModel object
 //! @param decayMode : decay mode object encapsulating the branching fraction and the list of particle types this particle decays into.
 //!
+//!  When a decay is added to a particle type, that type is automatically
+//!  considered unstable and decay enabled. Both flags can however be altered
+//!  as needed.
+//!
 void ParticleType::addDecayMode(ParticleDecayMode &decayMode)
 {
   decayModes.push_back(decayMode);
-  if (decayModes.size() > 1)
-    {
-    stable     = false;
-    weakStable = false; // need to figure how to this properly
-    }
+  stable = false;
+  decayEnabled = true;
 }
 
 void ParticleType::setupDecayGenerator()
@@ -247,10 +250,7 @@ void ParticleType::setupDecayGenerator()
   {
   decayBranchingRatios.push_back(decayModes[k].getBranchingRatio());
   }
-  //cout << " ParticleType::setupDecayGenerator() decayBranchingRatios.size() : " << decayBranchingRatios.size() << endl;
-
   decayRndmSelector.initializeWith(decayBranchingRatios);
-  setupDone =  true;
 }
 
 //!
@@ -905,7 +905,8 @@ ostream & ParticleType::printProperties(ostream & os)
   os <<  fixed << setw(5) << setprecision(1) <<  leptonMuon;
   os <<  fixed << setw(5) << setprecision(1) <<  leptonTau;
   os <<  fixed << setw(5) << setprecision(1) <<  stable;
-  os <<  fixed << setw(5) << setprecision(1) <<  weakStable;
+  os <<  fixed << setw(5) << setprecision(1) <<  decayEnabled;
+  os <<  fixed << setw(5) << setprecision(1) <<  enabled;
   os <<  endl;
   for (int k=0;k<int(decayModes.size());k++)
   {
@@ -1075,11 +1076,39 @@ ParticleType * ParticleType::getNucleusType()
 void   ParticleType::setStable(bool value)     { stable = value; }
 
 //!
-//! Set the weak stable state of  this particle to the given value. This can be used to declare a particle as stable even if it nominally decays into other particles within a finite lifeTime.
+//!  Set the enabled flag to true. Particle types  are considered
+//!  "enabled" when created. They can be disabled if not required or of
+//!  interest in a particular simulation.
 //!
-void   ParticleType::setweakStable(bool value) { weakStable = value; }
+void   ParticleType::enable() { enabled = true; }
 
+//!
+//!  Set the enabled flag to false. Particle types  are considered
+//!  "enabled" when created. They can be disabled if not required or of
+//!  interest in a particular simulation.
+//!
+void   ParticleType::disable() { enabled = false; }
 
+bool ParticleType::isDecayEnabled()  const
+{
+  return decayEnabled;
+}
+
+bool ParticleType::isDecayDisabled() const
+{
+  return !decayEnabled;
+}
+
+void ParticleType::enableDecay()
+{
+  if (decayModes.size()>0)
+    decayEnabled = true;
+}
+
+void ParticleType::disableDecay()
+{
+  decayEnabled = false;
+}
 
 std::vector<ParticleDecayMode> & ParticleType::getDecayModes()
 {

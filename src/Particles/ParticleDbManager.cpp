@@ -23,14 +23,29 @@ ParticleDbManager:: ParticleDbManager(const String & _name,
                                       const Configuration & _configuration)
 :
 EventTask(_name,_configuration),
-particleDbImport(1),
+particleDbImport(true),
 particleDbImportPath("ParticleData/"),
 particleDbImportFile("particles.data"),
 particleDbImportDecaysFile("decays.data"),
-particleDbExport(0),
+particleDbExport(false),
 particleDbExportPath("ParticleData/"),
 particleDbExportFile("newParticles.data"),
-particleDbExportDecaysFile("neweDecays.data"),
+particleDbExportDecaysFile("newDecays.data"),
+particleDbDisableAllParticles(false),
+particleDbDisableSelected(false),
+particleDbEnableAllParticles(false),
+particleDbEnableSelected(false),
+particleDbDisableAllDecays(false),
+particleDbDisableSelectedDecays(false),
+particleDbDisableWeakDecays(true),
+particleDbDisableLongLivedDecays(false),
+particleDbDisableShortLivedDecays(false),
+particleDbEnableAllDecays(false),
+particleDbEnableSelectedDecays(false),
+particleDbEnableWeakDecays(false),
+particleDbEnableLongLivedDecays(false),
+particleDbEnableShortLivedDecays(false),
+particleDbMaxLifeTime(0.0),
 particleDbs()
 {
   appendClassName("ParticleDbManager");
@@ -47,20 +62,82 @@ void ParticleDbManager::setDefaultConfiguration()
   addParameter("ParticleDbExportPath",        particleDbExportPath);
   addParameter("ParticleDbExportFile",        particleDbExportFile);
   addParameter("ParticleDbExportDecaysFile",  particleDbExportDecaysFile);
+  
+  addParameter("ParticleDbDisableAllParticles",    particleDbDisableAllParticles);
+  addParameter("ParticleDbDisableSelected",        particleDbDisableSelected);
+  addParameter("ParticleDbEnableAllParticles",     particleDbEnableAllParticles);
+  addParameter("ParticleDbEnableSelected",         particleDbEnableSelected);
+
+  addParameter("ParticleDbDisableAllDecays",       particleDbDisableAllDecays);
+  addParameter("ParticleDbDisableSelectedDecays",  particleDbDisableSelectedDecays);
+  addParameter("ParticleDbDisableWeakDecays",      particleDbDisableWeakDecays);
+  addParameter("ParticleDbDisableLongLivedDecays", particleDbDisableLongLivedDecays);
+  addParameter("ParticleDbDisableShortLivedDecays",particleDbDisableShortLivedDecays);
+  addParameter("ParticleDbEnableAllDecays",        particleDbEnableAllDecays);
+  addParameter("ParticleDbEnableSelectedDecays",   particleDbEnableSelectedDecays);
+  addParameter("ParticleDbEnableWeakDecays",       particleDbEnableWeakDecays);
+  addParameter("ParticleDbEnableLongLivedDecays",  particleDbEnableLongLivedDecays);
+  addParameter("ParticleDbEnableShortLivedDecays", particleDbEnableShortLivedDecays);
+  addParameter("ParticleDbMaxLifeTime",            particleDbMaxLifeTime);
+
+  // Setup disabling selected particles
+  String none("none");
+  for (int k=0; k<40; k++)
+    {
+    String s = "Disable"; s += k;
+    addParameter(s,none);
+    }
+
+  // Setup enabling selected particles
+  for (int k=0; k<40; k++)
+    {
+    String s = "Enable"; s += k;
+    addParameter(s,none);
+    }
+
+  // Setup decay disabling of selected particles
+  for (int k=0; k<40; k++)
+    {
+    String s = "DisableDecay"; s += k;
+    addParameter(s,none);
+    }
+
+  // Setup decay enabling of selected particles
+  for (int k=0; k<40; k++)
+    {
+    String s = "EnableDecay"; s += k;
+    addParameter(s,none);
+    }
 }
 
 
 void ParticleDbManager::configure()
 {
   EventTask::configure();
-  particleDbImport           = getValueBool(  "ParticleDbImport"            );
-  particleDbImportPath       = getValueString("ParticleDbImportPath"        );
-  particleDbImportFile       = getValueString("ParticleDbImportFile"        );
-  particleDbImportDecaysFile = getValueString("ParticleDbImportDecaysFile"  );
-  particleDbExport           = getValueBool(  "ParticleDbExport"            );
-  particleDbExportPath       = getValueString("ParticleDbExportPath"        );
-  particleDbExportFile       = getValueString("ParticleDbExportFile"        );
-  particleDbExportDecaysFile = getValueString("ParticleDbExportDecaysFile"  );
+  particleDbImport            = getValueBool(  "ParticleDbImport"           );
+  particleDbImportPath        = getValueString("ParticleDbImportPath"       );
+  particleDbImportFile        = getValueString("ParticleDbImportFile"       );
+  particleDbImportDecaysFile  = getValueString("ParticleDbImportDecaysFile" );
+  particleDbExport            = getValueBool(  "ParticleDbExport"           );
+  particleDbExportPath        = getValueString("ParticleDbExportPath"       );
+  particleDbExportFile        = getValueString("ParticleDbExportFile"       );
+  particleDbExportDecaysFile  = getValueString("ParticleDbExportDecaysFile" );
+  
+  particleDbDisableAllParticles    = getValueBool(  "ParticleDbDisableAllParticles"       );
+  particleDbDisableSelected        = getValueBool(  "ParticleDbDisableSelected"           );
+  particleDbEnableAllParticles     = getValueBool(  "ParticleDbEnableAllParticles"        );
+  particleDbDisableAllDecays       = getValueBool(  "ParticleDbDisableAllDecays"          );
+  particleDbDisableSelectedDecays  = getValueBool(  "ParticleDbDisableSelectedDecays"     );
+  particleDbDisableWeakDecays      = getValueBool(  "ParticleDbDisableWeakDecays"         );
+  particleDbDisableLongLivedDecays = getValueBool(  "ParticleDbDisableLongLivedDecays"    );
+  particleDbDisableShortLivedDecays= getValueBool(  "ParticleDbDisableShortLivedDecays"   );
+  particleDbEnableAllDecays        = getValueBool(  "ParticleDbEnableAllDecays"           );
+  particleDbEnableSelectedDecays   = getValueBool(  "ParticleDbEnableSelectedDecays"      );
+  particleDbEnableWeakDecays       = getValueBool(  "ParticleDbEnableWeakDecays"          );
+  particleDbEnableLongLivedDecays  = getValueBool(  "ParticleDbEnableLongLivedDecays"     );
+  particleDbEnableShortLivedDecays = getValueBool(  "ParticleDbEnableLongLivedDecays"     );
+  particleDbMaxLifeTime            = getValueDouble("ParticleDbMaxLifeTime"               );
+
   if (reportInfo(__FUNCTION__))
     {
     cout << endl;
@@ -72,6 +149,16 @@ void ParticleDbManager::configure()
     printItem("ParticleDbExportPath"       ,particleDbExportPath);
     printItem("ParticleDbExportFile"       ,particleDbExportFile);
     printItem("ParticleDbExportDecaysFile" ,particleDbExportDecaysFile);
+    printItem("particleDbDisableSelected"        ,particleDbDisableSelected);
+    printItem("particleDbDisableSelectedDecays"  ,particleDbDisableSelectedDecays);
+    printItem("particleDbDisableWeakDecays"      ,particleDbDisableWeakDecays);
+    printItem("particleDbDisableLongLivedDecays" ,particleDbDisableLongLivedDecays);
+    printItem("particleDbDisableShortLivedDecays",particleDbDisableShortLivedDecays);
+    printItem("particleDbEnableSelectedDecays"   ,particleDbEnableSelectedDecays);
+    printItem("particleDbEnableWeakDecays"       ,particleDbEnableWeakDecays);
+    printItem("particleDbEnableLongLivedDecays"  ,particleDbEnableLongLivedDecays);
+    printItem("particleDbEnableLongLivedDecays"  ,particleDbEnableShortLivedDecays);
+    printItem("particleDbMaxLifeTime"            ,particleDbMaxLifeTime);
     cout << endl;
     }
   if (reportDebug(__FUNCTION__)) printConfiguration(cout);
@@ -86,6 +173,46 @@ void ParticleDbManager::initialize()
   if (particleDbImport || particleDbExport)
     {
     importParticleDb();
+    }
+
+  if (particleDbDisableAllParticles) disableAllParticles();
+  if (particleDbDisableSelected)
+    {
+    // First disable all particles, then selectively
+    // choose those to be re-enabled.
+    enableAllParticles();
+    disableSelectedParticles();
+    }
+  if (particleDbEnableAllParticles) enableAllParticles();
+  if (particleDbEnableSelected)
+    {
+    // First disable all particles, then selectively
+    // choose those to be re-enabled.
+    disableAllParticles();
+    enableSelectedParticles();
+    }
+
+  if (particleDbDisableAllDecays) disableAllDecays();
+  if (particleDbDisableSelectedDecays) // default
+    {
+    // first turn on all decays
+    // next optionally turn off selected decays
+    enableAllDecays();
+    if (particleDbDisableWeakDecays) disableWeakDecays();
+    if (particleDbDisableLongLivedDecays)  disableLongLivedWith(particleDbMaxLifeTime);
+    if (particleDbDisableShortLivedDecays) disableShortLivedWith(particleDbMaxLifeTime);
+    disableSelectedDecays();
+    }
+  if (particleDbEnableAllDecays) enableAllDecays();
+  if (particleDbEnableSelectedDecays)
+    {
+    // first turn off all decays
+    // next optionally turn on selected decays
+    disableAllDecays();
+    if (particleDbEnableWeakDecays) enableWeakDecays();
+    if (particleDbEnableLongLivedDecays)  enableLongLivedWith(particleDbMaxLifeTime);
+    if (particleDbEnableShortLivedDecays) enableShortLivedWith(particleDbMaxLifeTime);
+    enableSelectedDecays();
     }
 }
 
@@ -144,7 +271,7 @@ void ParticleDbManager::initialize()
 //    //pdgCode, theName, theTitle, mass, width, gSpin, baryonNumber, strangeNumber,
 //    //                               charmNumber, bottomNumber, gIsospin, charge);
 //    particleType->setIndex(index); index++;
-//    particleDb->addParticleType(particleType);
+//    particleDb.addParticleType(particleType);
 //
 //    if (particleType->isFermion())
 //      {
@@ -157,7 +284,7 @@ void ParticleDbManager::initialize()
 //      //                                           -baryonNumber, -strangeNumber, -charmNumber, -bottomNumber, gIsospin,
 //      //                                           -charge);
 //      antiParticleType->setIndex(index); index++;
-//      particleDb->addParticleType(antiParticleType);
+//      particleDb.addParticleType(antiParticleType);
 //      }
 //    // read decay information
 //    for (int j = 0; j < nDecayModes; j++)
@@ -185,7 +312,7 @@ void ParticleDbManager::initialize()
 //        {
 //        for (int k=0; k<decayNpart; k++)
 //          {
-//          antiChildren.push_back(particleDb->findPdgCode(decayPart[k])->getAntiParticlePdgCode());
+//          antiChildren.push_back(particleDb.findPdgCode(decayPart[k])->getAntiParticlePdgCode());
 //          }
 //        particleType->addDecayMode(decayBranchingRatio,children);
 //        antiParticleType->addDecayMode(decayBranchingRatio,antiChildren);
@@ -199,9 +326,9 @@ void ParticleDbManager::initialize()
 //  }
 //  inputFile.close();
 //  if (reportInfo(__FUNCTION__))
-//    cout << "Total number of particles read: " <<  particleDb->getNumberOfTypes() << endl;
-//  particleDb->resolveTypes();
-//  particleDb->sortByMass();
+//    cout << "Total number of particles read: " <<  particleDb.getNumberOfTypes() << endl;
+//  particleDb.resolveTypes();
+//  particleDb.sortByMass();
 //}
 
 //!
@@ -280,6 +407,9 @@ void ParticleDbManager::importParticleDb()
     particleType->setCharmNumber(  static_cast<int> ( netC   ));
     particleType->setBottomNumber( 0 );
     particleType->setPdgCode(static_cast<int> ( pdgCode));
+    particleType->setStable(true);            // default until decays are added
+    particleType->enableDecay();              // default: decays allowed if any
+    particleType->enable();                   // default: all particle active/included
     particleDb->addParticleType(particleType);
     delete iss;
     }
@@ -661,3 +791,277 @@ void ParticleDbManager::dbAnalyzer()
       }
     }
 }
+
+CAP::ParticleDb & ParticleDbManager::getActiveParticleDb()
+{
+  ParticleDb * particleDb = particleDbs[0];
+  if (!particleDb)
+    {
+    String s = "No ParticleDb available";
+    throw TaskException(s,"ParticleDbManager::getActiveParticleDb()");
+    }
+  return *particleDb;
+}
+
+void ParticleDbManager::enableAllParticles()
+{
+  ParticleDb & particleDb = getActiveParticleDb();
+  Size_t n = particleDb.getNumberOfTypes();
+  for (Size_t k=0; k<n; k++)
+    {
+    particleDb[k]->enable();
+    }
+}
+
+void ParticleDbManager::enableSelectedParticles()
+{
+  ParticleDb & particleDb = getActiveParticleDb();
+  // Setup parameters to enable disabling selected particles
+  String none("none");
+  for (int k=0; k<40; k++)
+    {
+    String s = "Enable"; s += k;
+    String particleName = getValueString(s);
+    if (particleName.EqualTo(none)) continue;
+    ParticleType * type = particleDb.getParticleType(particleName);
+    if (!type)
+      {
+      String except = "No Particle called ";
+      except += particleName;
+      throw TaskException(s,"ParticleDbManager::enableSelectedParticles()");
+      }
+    type->enable();
+    }
+}
+
+void ParticleDbManager::disableAllParticles()
+{
+  ParticleDb & particleDb = getActiveParticleDb();
+  Size_t n = particleDb.getNumberOfTypes();
+  for (Size_t k=0; k<n; k++)
+    {
+    particleDb[k]->disable();
+    }
+}
+
+void ParticleDbManager::disableSelectedParticles()
+{
+  ParticleDb & particleDb = getActiveParticleDb();
+  // Setup parameters to enable disabling selected particles
+  String none("none");
+  for (int k=0; k<40; k++)
+    {
+    String s = "Disable"; s += k;
+    String particleName = getValueString(s);
+    if (particleName.EqualTo(none)) continue;
+    ParticleType * type = particleDb.getParticleType(particleName);
+    if (!type)
+      {
+      String except = "No Particle called ";
+      except += particleName;
+      throw TaskException(s,"ParticleDbManager::disableSelectedParticles()");
+      }
+    type->disable();
+    }
+}
+
+void ParticleDbManager::disableAllDecays()
+{
+  ParticleDb & particleDb = getActiveParticleDb();
+  Size_t n = particleDb.getNumberOfTypes();
+  for (Size_t k=0; k<n; k++)
+    {
+    particleDb[k]->disableDecay();
+    }
+}
+
+void ParticleDbManager::disableWeakDecays()
+{
+  ParticleDb & particleDb = getActiveParticleDb();
+  vector<String> selectedParticles;
+  // kaons
+  selectedParticles.push_back( String("Ka0492zer")); // 311);   // neutral kaons
+  selectedParticles.push_back( String("Ka0492zrb")); // -311);
+  // lambda
+  selectedParticles.push_back( String("Lm1115zer")); //  3122); // lambda
+  selectedParticles.push_back( String("Lm1115zrb")); // -3122);
+  // sigma
+  selectedParticles.push_back( String("Sg1189min")); //  3112); // sigmas
+  selectedParticles.push_back( String("Sg1189mnb")); // -3112);
+  selectedParticles.push_back( String("Sg1192zer")); //  3212);
+  selectedParticles.push_back( String("Sg1192zrb")); // -3212);
+  selectedParticles.push_back( String("Sg1189plu")); //  3222);
+  selectedParticles.push_back( String("Sg1189plb")); // -3222);
+  // xi (cascade)
+  selectedParticles.push_back( String("Xi1321min")); //  3312);  // cascades
+  selectedParticles.push_back( String("Xi1321mnb")); // -3312);
+  selectedParticles.push_back( String("Xi1321zer")); //  3322);
+  selectedParticles.push_back( String("Xi1321zrb")); // -3322);
+  // Omega
+  selectedParticles.push_back( String("UM1672min")); //  3334);  // Omegas
+  selectedParticles.push_back( String("UM1672mnb")); // -3334);
+
+  Size_t nSelected = selectedParticles.size();
+  for (Size_t k=0; k<nSelected; k++)
+    {
+    ParticleType * type = particleDb.getParticleType(selectedParticles[k]);
+    if (!type)
+      {
+      String except = "No Particle with Name=";
+      except += selectedParticles[k];
+      throw TaskException(except,"ParticleDbManager::disableWeakDecays()");
+      }
+    type->disableDecay();
+    }
+}
+
+void ParticleDbManager::disableLongLivedWith(double lifeTime)
+{
+  ParticleDb & particleDb = getActiveParticleDb();
+  Size_t n = particleDb.getNumberOfTypes();
+  for (Size_t k=0; k<n; k++)
+    {
+    if (!particleDb[k]->isStable())
+      {
+      double tau = particleDb[k]->getLifeTime();
+      if (tau>lifeTime) particleDb[k]->disableDecay();
+      }
+    }
+}
+
+void ParticleDbManager::disableShortLivedWith(double lifeTime)
+{
+  ParticleDb & particleDb = getActiveParticleDb();
+  Size_t n = particleDb.getNumberOfTypes();
+  for (Size_t k=0; k<n; k++)
+    {
+    if (!particleDb[k]->isStable())
+      {
+      double tau = particleDb[k]->getLifeTime();
+      if (tau<=lifeTime) particleDb[k]->disableDecay();
+      }
+    }
+}
+
+
+void ParticleDbManager::disableSelectedDecays()
+{
+  ParticleDb & particleDb = getActiveParticleDb();
+  // Setup parameters to enable decay disable of selected particles
+  String none("none");
+  for (int k=0; k<40; k++)
+    {
+    String s = "DisableDecay"; s += k;
+    String particleName = getValueString(s);
+    if (particleName.EqualTo(none)) continue;
+    ParticleType * type = particleDb.getParticleType(particleName);
+    if (!type)
+      {
+      String except = "No Particle called ";
+      except += particleName;
+      throw TaskException(s,"ParticleDbManager::disableSelectedDecays()");
+      }
+    type->disableDecay();
+    }
+}
+
+void ParticleDbManager::enableAllDecays()
+{
+  ParticleDb & particleDb = getActiveParticleDb();
+  Size_t n = particleDb.getNumberOfTypes();
+  for (Size_t k=0; k<n; k++)
+    {
+    particleDb[k]->enableDecay();
+    }
+}
+
+void ParticleDbManager::enableWeakDecays()
+{
+  ParticleDb & particleDb = getActiveParticleDb();
+  vector<String> selectedParticles;
+  // kaons
+  selectedParticles.push_back( String("Ka0492zer")); // 311);   // neutral kaons
+  selectedParticles.push_back( String("Ka0492zrb")); // -311);
+  // lambda
+  selectedParticles.push_back( String("Lm1115zer")); //  3122); // lambda
+  selectedParticles.push_back( String("Lm1115zrb")); // -3122);
+  // sigma
+  selectedParticles.push_back( String("Sg1189min")); //  3112); // sigmas
+  selectedParticles.push_back( String("Sg1189mnb")); // -3112);
+  selectedParticles.push_back( String("Sg1192zer")); //  3212);
+  selectedParticles.push_back( String("Sg1192zrb")); // -3212);
+  selectedParticles.push_back( String("Sg1189plu")); //  3222);
+  selectedParticles.push_back( String("Sg1189plb")); // -3222);
+  // xi (cascade)
+  selectedParticles.push_back( String("Xi1321min")); //  3312);  // cascades
+  selectedParticles.push_back( String("Xi1321mnb")); // -3312);
+  selectedParticles.push_back( String("Xi1321zer")); //  3322);
+  selectedParticles.push_back( String("Xi1321zrb")); // -3322);
+  // Omega
+  selectedParticles.push_back( String("UM1672min")); //  3334);  // Omegas
+  selectedParticles.push_back( String("UM1672mnb")); // -3334);
+
+  Size_t nSelected = selectedParticles.size();
+  for (Size_t k=0; k<nSelected; k++)
+    {
+    ParticleType * type = particleDb.getParticleType(selectedParticles[k]);
+    if (!type)
+      {
+      String except = "No Particle with Name=";
+      except += selectedParticles[k];
+      throw TaskException(except,"ParticleDbManager::disableWeakDecays()");
+      }
+    type->enableDecay();
+    }
+}
+
+void ParticleDbManager::enableLongLivedWith(double lifeTime)
+{
+  ParticleDb & particleDb = getActiveParticleDb();
+  Size_t n = particleDb.getNumberOfTypes();
+  for (Size_t k=0; k<n; k++)
+    {
+    if (!particleDb[k]->isStable())
+      {
+      double tau = particleDb[k]->getLifeTime();
+      if (tau>lifeTime) particleDb[k]->enableDecay();
+      }
+    }
+}
+
+void ParticleDbManager::enableShortLivedWith(double lifeTime)
+{
+  ParticleDb & particleDb = getActiveParticleDb();
+  Size_t n = particleDb.getNumberOfTypes();
+  for (Size_t k=0; k<n; k++)
+    {
+    if (!particleDb[k]->isStable())
+      {
+      double tau = particleDb[k]->getLifeTime();
+      if (tau<lifeTime) particleDb[k]->enableDecay();
+      }
+    }
+}
+
+void ParticleDbManager::enableSelectedDecays()
+{
+  ParticleDb & particleDb = getActiveParticleDb();
+  // Setup parameters to enable decay disable of selected particles
+  String none("none");
+  for (int k=0; k<40; k++)
+    {
+    String s = "EnableDecay"; s += k;
+    String particleName = getValueString(s);
+    if (particleName.EqualTo(none)) continue;
+    ParticleType * type = particleDb.getParticleType(particleName);
+    if (!type)
+      {
+      String except = "No Particle called ";
+      except += particleName;
+      throw TaskException(s,"ParticleDbManager::enableSelectedDecays()");
+      }
+    type->disableDecay();
+    }
+}
+
+

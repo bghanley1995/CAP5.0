@@ -227,7 +227,7 @@ void ParticleDb::setupDecayGenerator()
 // Extract a subset of this collection based on the given ctriterion
 // option : types selected
 //      0 : stable particle types
-//      1 : weakly stable
+//      1 :
 //      2 : unstable
 //      3 : mesons
 //      4 : baryons
@@ -244,10 +244,10 @@ ParticleDb *  ParticleDb::extractCollection(int option)
   ParticleType * type = objects[iPart];
   switch (option)
     {
-      case 0:  if (type->isStable()     && !type->isPhoton())  collection->push_back(type); break;
-      case 1:  if (type->isWeakStable() && !type->isPhoton())  collection->push_back(type); break;
-      case 2:  if (!type->isStable())     collection->push_back(type); break;
-      case 3:  if (!type->isWeakStable()) collection->push_back(type); break;
+      case 0:  if (type->isStable()         && !type->isPhoton())  collection->push_back(type); break;
+      case 1:  if (type->isDecayDisabled() && !type->isPhoton())  collection->push_back(type); break;
+      case 2:  if (!type->isStable())         collection->push_back(type); break;
+      case 3:  if (!type->isDecayDisabled()) collection->push_back(type); break;
       case 4:  if (type->isMeson())       collection->push_back(type); break;
       case 5:  if (type->isBaryon())      collection->push_back(type); break;
       case 6:  if (type->isLepton())      collection->push_back(type); break;

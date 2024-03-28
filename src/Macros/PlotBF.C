@@ -12,7 +12,7 @@
 void loadBase(const TString & includeBasePath);
 void loadPlotting(const TString & includeBasePath);
 
-int PlotBF(int choice = -2)
+int PlotBF(int choice = 12)
 {
   const bool YES = true;
   const bool NO  = false;

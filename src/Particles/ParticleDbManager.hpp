@@ -71,6 +71,24 @@ public:
   virtual void exportParticleDb();
   virtual void dbAnalyzer();
 
+  virtual  ParticleDb & getActiveParticleDb();
+
+  virtual void enableAllParticles();
+  virtual void enableSelectedParticles();
+  virtual void disableAllParticles();
+  virtual void disableSelectedParticles();
+
+  virtual void disableAllDecays();
+  virtual void disableWeakDecays();
+  virtual void disableLongLivedWith(double lifeTime);
+  virtual void disableShortLivedWith(double lifeTime);
+  virtual void disableSelectedDecays();
+  virtual void enableAllDecays();
+  virtual void enableWeakDecays();
+  virtual void enableLongLivedWith(double lifeTime);
+  virtual void enableShortLivedWith(double lifeTime);
+  virtual void enableSelectedDecays();
+
 protected:
 
   double clebschGordan(double aJot,  double aEm,
@@ -86,6 +104,22 @@ protected:
   String particleDbExportPath;
   String particleDbExportFile;
   String particleDbExportDecaysFile;
+
+  bool particleDbDisableAllParticles;
+  bool particleDbDisableSelected;
+  bool particleDbEnableAllParticles;
+  bool particleDbEnableSelected;
+  bool particleDbDisableAllDecays;
+  bool particleDbDisableSelectedDecays;
+  bool particleDbDisableWeakDecays;
+  bool particleDbDisableLongLivedDecays;
+  bool particleDbDisableShortLivedDecays;
+  bool particleDbEnableAllDecays;
+  bool particleDbEnableSelectedDecays;
+  bool particleDbEnableWeakDecays;
+  bool particleDbEnableLongLivedDecays;
+  bool particleDbEnableShortLivedDecays;
+  double particleDbMaxLifeTime;
   vector<ParticleDb*> particleDbs;
   ClassDef(ParticleDbManager,0)
 };
