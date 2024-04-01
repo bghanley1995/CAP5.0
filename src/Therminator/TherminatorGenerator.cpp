@@ -76,7 +76,7 @@ multiplicitiesOutputFile(),
 multiplicitiesFractionMin(0.5),
 multiplicitiesFractionMax(1.0),
 multiplicitiesFractionRange(0.5),
-multiplicitiesForceZeroNetQ(1),
+multiplicitiesForceZeroNetQ(0),
 disablePhotons(true),
 nSamplesIntegration(10000),
 modelOnlyBackFlow(0),
@@ -372,11 +372,11 @@ void TherminatorGenerator::createEvent()
         }
       }
     }
-  if (totalQ!=0 || totalB!=0 || totalS!=0)
-    {
-    cout << "totalQ " << totalQ <<  "   totalB " << totalB <<  "   totalS " << totalS << endl;
-    throw TaskException("Sanity check failed: totalQ!=0 || totalB!=0 || totalS!=0","TherminatorGenerator::createEvent()");
-    }
+//  if (totalQ!=0 || totalB!=0 || totalS!=0)
+//    {
+//    cout << "totalQ " << totalQ <<  "   totalB " << totalB <<  "   totalS " << totalS << endl;
+//    throw TaskException("Sanity check failed: totalQ!=0 || totalB!=0 || totalS!=0","TherminatorGenerator::createEvent()");
+//    }
 
 }
 

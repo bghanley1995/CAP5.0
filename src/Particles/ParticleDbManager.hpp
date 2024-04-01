@@ -88,6 +88,7 @@ public:
   virtual void enableLongLivedWith(double lifeTime);
   virtual void enableShortLivedWith(double lifeTime);
   virtual void enableSelectedDecays();
+  virtual void listParticleStatus();
 
 protected:
 
