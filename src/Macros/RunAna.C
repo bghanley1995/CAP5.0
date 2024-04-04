@@ -43,7 +43,7 @@ void loadTherminator(const TString & includeBasePath);
 //! nBunches :  number of bunches  (must be 1 on grid)
 //!
 int RunAna(TString configFile="Therminator/AnalysisTherminator_bwT180_CH_Y10.ini",
-           TString histogramPath="./therminatorTest/",
+           TString histogramPath="./therminatorTestZeroMu/",
            long seed=1121331,
            bool isGrid=false,
            long nEventsPerSubbunch=10,
