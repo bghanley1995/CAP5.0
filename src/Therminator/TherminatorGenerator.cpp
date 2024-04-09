@@ -692,10 +692,15 @@ void TherminatorGenerator::finalizeEventGenerator()
 
 void TherminatorGenerator::importMultiplicities()
 {
+  String dbPath = taskDbPath;
+  dbPath += "/";
+  dbPath += multiplicitiesInputPath;
+
   if (reportInfo(__FUNCTION__))
     {
     cout << endl;
     printItem("multiplicitiesInputPath",multiplicitiesInputPath);
+    printItem("dbPath",dbPath);
     printItem("multiplicitiesInputFile",multiplicitiesInputFile);
     }
   // initialize the multiplicity array
@@ -712,7 +717,8 @@ void TherminatorGenerator::importMultiplicities()
     averageMultiplicities.push_back(pm);
     }
   if (reportDebug(__FUNCTION__)) cout <<" averageMultiplicities initialized -- now open and read the file" << endl;
-  ifstream & inputFile = openInputAsciiFile(multiplicitiesInputPath,multiplicitiesInputFile,".txt");
+  ifstream & inputFile = openInputAsciiFile(dbPath,multiplicitiesInputFile,".txt");
+
   try {
     {
     int count = 0;
@@ -753,9 +759,21 @@ void TherminatorGenerator::importMultiplicities()
 
 void TherminatorGenerator::exportMultiplicities()
 {
+  String dbPath = taskDbPath;
+  dbPath += "/";
+  dbPath += multiplicitiesOutputPath;
+
+  if (reportInfo(__FUNCTION__))
+    {
+    cout << endl;
+    printItem("multiplicitiesOutputPath",multiplicitiesOutputPath);
+    printItem("dbPath",dbPath);
+    printItem("multiplicitiesOutputFile",multiplicitiesOutputFile);
+    }
+
   // create the outputpath if it does not exist...
-  gSystem->mkdir(multiplicitiesOutputPath,1);
-  ofstream & outputFile = openOutputAsciiFile(multiplicitiesOutputPath,multiplicitiesOutputFile,".txt");
+  gSystem->mkdir(dbPath,1);
+  ofstream & outputFile = openOutputAsciiFile(dbPath,multiplicitiesOutputFile,".txt");
   unsigned int nTypes = averageMultiplicities.size();
   for (unsigned int iType=0; iType<nTypes; iType++)
     {

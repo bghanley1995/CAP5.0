@@ -12,7 +12,7 @@
 void loadBase(const TString & includeBasePath);
 void loadPlotting(const TString & includeBasePath);
 
-int PlotBF(int choice = 12)
+int PlotBF(int choice = -2)
 {
   const bool YES = true;
   const bool NO  = false;
@@ -78,7 +78,7 @@ int PlotBF(int choice = 12)
       plotter->outputPathNameBase = "/Volumes/ClaudeDisc4/OutputFiles/Therminator/T180/";
       plotter->outputFileNameBase = "Therminator_piKp_A2Based_";
 
-      plotter->addSystem("/Volumes/ClaudeDisc4/OutputFiles/Therminator/BW/BW_T180_Y10",
+      plotter->addSystem("/Volumes/ClaudeDisc4/OutputFiles/Therminator/T180-WithRes-ZeroMu/",
                          "PairGenBalFctSum0TO39.root",
                          "Therminator",
                          "PairGen_All_",
