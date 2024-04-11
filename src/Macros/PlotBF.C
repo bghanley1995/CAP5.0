@@ -78,7 +78,7 @@ int PlotBF(int choice = -2)
       plotter->outputPathNameBase = "/Volumes/ClaudeDisc4/OutputFiles/Therminator/T180/";
       plotter->outputFileNameBase = "Therminator_piKp_A2Based_";
 
-      plotter->addSystem("/Volumes/ClaudeDisc4/OutputFiles/Therminator/T180-WithRes-ZeroMu/",
+      plotter->addSystem("/Volumes/ClaudeDisc4/OutputFiles/therminatorTestZeroMu/",
                          "PairGenBalFctSum0TO39.root",
                          "Therminator",
                          "PairGen_All_",
